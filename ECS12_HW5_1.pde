@@ -4,7 +4,7 @@ PImage sprite;
 PImage spriteBck;
 PImage background;
 PImage outImg;
-
+int threshold = 15;
 
 
 void setup() 
@@ -17,8 +17,6 @@ void setup()
   outImg =  loadImage("Arches-National-Park.jpg");
 
   CreateSprite(spriteSrc, spriteBck, sprite);
-  
- 
 }
 
 //A sprite is an image that you can move around the screen on top of a background.
@@ -35,16 +33,36 @@ void setup()
 //Make sure all three images are the same size (simplifying assumption)
 void CreateSprite(PImage spriteSrc, PImage spriteBck, PImage sprite)
 {
-  //add your code here
-}
+  spriteSrc.loadPixels();
+  spriteBck.loadPixels();
+  sprite.loadPixels();
+  for (int x = 0; x < spriteSrc.width; x ++ ) {
+    for (int y = 0; y < spriteSrc.height; y ++ ) {
 
+      int index = y * spriteSrc.width + x; //Index of array
+      color spriteColor = spriteSrc.pixels[index]; //The current color of the sprite
+      color bgColor = spriteBck.pixels[index]; //The current color of the background
+      float r1 = red(spriteColor); //The red value of the sprite
+      float g1 = green(spriteColor); //The green value of the sprite
+      float b1 = blue(spriteColor); //The blue value of the sprite
+      float r2 = red(bgColor); //The red value of the sprite
+      float g2 = green(bgColor); //The green value of the sprite
+      float b2 = blue(bgColor); //The blue value of the sprite
+      float diff = dist(r1, g1, b1, r2, g2, b2); //Comparing the two current pixel colors
+      if(diff < threshold) sprite.pixels[index] = color (0, 0, 0, 255);
+      else sprite.pixels[index] = spriteColor;
+      sprite.updatePixels();
+    }
+  }
+}
 //Add your animation code here.  Be sure to draw both your background image
 //and your sprite.
 void draw() 
 {
   //add your code here
+  background.loadPixels();
 
-
+  CreateSprite( spriteSrc, spriteBck, sprite );
 }
 
 //This function should create some "disruption" of the image, centred at location
@@ -63,5 +81,4 @@ void mousePressed()
 {
   save("sampleOut.jpg");
 }
-
 

@@ -4,7 +4,7 @@ PImage sprite;
 PImage spriteBck;
 PImage background;
 PImage outImg;
-int threshold = 15;
+int threshold = 75;
 
 
 void setup() 
@@ -49,9 +49,9 @@ void CreateSprite(PImage spriteSrc, PImage spriteBck, PImage sprite)
       float g2 = green(bgColor); //The green value of the sprite
       float b2 = blue(bgColor); //The blue value of the sprite
       float diff = dist(r1, g1, b1, r2, g2, b2); //Comparing the two current pixel colors
-      if(diff < threshold) sprite.pixels[index] = color (0, 0, 0, 255);
-      else sprite.pixels[index] = spriteColor;
-      sprite.updatePixels();
+      if (diff < threshold) sprite.pixels[index] = color (0, 0); //If the threshold isnt met, the color of the sprite is transparent
+      else sprite.pixels[index] = spriteColor; //If the threshold is met, the color of the sprite remains
+      sprite.updatePixels(); //Update the pixels of the sprite
     }
   }
 }
@@ -61,8 +61,11 @@ void draw()
 {
   //add your code here
   background.loadPixels();
-
+  image(background, 0, 0);
   CreateSprite( spriteSrc, spriteBck, sprite );
+  scale(.35);
+  image(sprite, 1800, 1000);
+  LeaveTrail(background, outImg, .35 * 1800, .35 1000);
 }
 
 //This function should create some "disruption" of the image, centred at location
@@ -72,9 +75,35 @@ void draw()
 // the background.
 //Disruptions could include blurring the section of the image, making it brighter or darker,
 //shifting the color, etc.  The disruption should modify the pixel values.
-void LeaveTrail(PImage src, PImage out, int x, int y, int size)
+void LeaveTrail(PImage src, PImage out, int xin, int yin, int size)
 {
-  //add your code here
+  src.loadPixels();
+  out.loadPixels();
+  color[] verticalColor = new color[src.width];
+  for (float x = 0; x < src.width; x ++ ) {
+    if (vecticalColor[x] != null) {
+      noiseSeed(1);
+      int col1 = noise(x/1000);
+      noiseSeed(2);
+      int col2 = noise(x/1000);
+      noiseSeed(3);
+      int col3 = noise(x/1000);
+      vecticalColor[x] = color(col1, col2, col3);
+    }
+    for (float y = 0; y < src.height; y ++ ) {
+      if (x <= (xin + 100) && y <= (yin + 300) && y >= yin) {
+        int index = y * src.width + x; //Index of array
+        color srcColor = src.pixels[index]; //The current color of the image
+        float r = red(srcColor); //The red value of the image
+        float g = green(srcColor); //The green value of the image
+        float b = blue(srcColor); //The blue value of the image
+        color streak = color(r + red(vecticalColor[x]), g + green(vecticalColor[x]), b + blue(vecticalColor[x])) ;
+        out.pixels[index] = streak;
+      }
+      else out.pixels[index] = src.pixels[index];
+    }
+  }
+  out.updatePixels();
 }
 
 void mousePressed()

@@ -1,3 +1,4 @@
+//Michael Figueroa
 //All the images that are used to create the background and sprite
 PImage spriteSrc;
 PImage sprite;
